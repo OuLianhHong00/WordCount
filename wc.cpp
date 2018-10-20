@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<ctype.h>
 #include<string.h>
-
+#include<io.h>
 int main(int argc, char* argv[])
 { 
 	//计算单词数
@@ -18,12 +18,12 @@ int main(int argc, char* argv[])
 	//注释行
     int count_noteLine(char *file);
 	//递归找符合条件的文件
-    void scanFile();
+    void Scan(char *file, char type);
 	//将内容输出到outputFile.txt文件中
 	void printFile(char *file,int result,char type);
 	int cw=0,cc=0,cl=0,cb=0,ccl=0,cn=0;
 	FILE *fp;
-
+    char type='c';
 	while(1==1){
 		//printf("请输入可执行文件名\n");
 		//printf("请输入想要进行的操作（-w表示计算单词数 -c表示计算字符数 -l表示计算行数 -a表示计算空行 代码行 注释行 -s表示符合条件的文件数）\n");
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 		 }
 		 if(!strcmp(argv[1],"-s"))//递归目录下符合条件的文件
 		 {
-		     scanFile();
+		     Scan(argv[2],type);
 		 }
 		 if(!strcmp(argv[1],"-o"))
 		 {
@@ -226,11 +226,68 @@ int main(int argc, char* argv[])
 	   return nlCount;
 	}
 	//递归找符合条件的文件
-    void scanFile()
-	{
-	   printf("you");
-	 
+   void Scan(char *Path, char Type) {
+	char *FileName = NULL;
+	char *FileType = NULL;
+	char Temp[30];	//用于暂存改变得字符串
+	long Head;
+	struct _finddata_t FileData;
+	int i = 0;
+
+	FileName = Path;
+	while (*(Path + i) != '\0') {	//找出文件名和文件类型的位置
+		if (*(Path + i) == '\\')
+			FileName = Path + i + 1;
+		if (*(Path + i) == '.')
+			FileType = Path + i + 1;
+		i++;
 	}
+	
+	strcpy(Temp, FileType);//调整字符串
+	*FileType = '*';
+	*(FileType + 1) = '\0';
+	
+	Head = _findfirst(Path, &FileData);
+	
+	strcpy(FileType, Temp);//恢复字符串
+
+	do {
+		if ( !strcmp(FileData.name, "..") || !strcmp(FileData.name, "."))	//去除前驱文件路径
+			continue;
+		
+		if (_A_SUBDIR == FileData.attrib)	//是文件夹
+		{	
+			strcpy(Temp, FileName);	//调整字符串
+			for (i = 0; *(FileData.name + i) != '\0'; i++) {
+				*(FileName + i) = *(FileData.name + i);
+			}
+			*(FileName + i) = '\\';
+			*(FileName + i + 1) = '\0';
+			strcat(Path, Temp);
+
+			Scan(Path, Type);
+
+			strcpy(FileName, Temp);	//恢复字符串			
+		}
+		else//是文件 
+		{	
+			for (i = 0; *(FileData.name + i) != '.'; i++);
+			if (!strcmp(FileData.name + i + 1, FileType)) {	//是指定类型的文件
+				
+				strcpy(Temp, FileName);
+				strcpy(FileName, FileData.name); //调整字符串
+				
+			printf("%s:  ", FileData.name);
+				//Run(Type, NULL, Path);	//将地址及功能传到启动函数
+				printf("\n");
+
+				strcpy(FileName, Temp);//恢复字符串
+			}
+		}
+	} while (_findnext(Head, &FileData) == 0);
+
+	_findclose(Head);	
+}
 	void printFile(char *file,int result,char type){
 	  FILE *wp;
 	  if((wp=fopen("outputFile.txt","a"))==NULL){
@@ -259,3 +316,5 @@ int main(int argc, char* argv[])
 	  }
      fclose(wp);
 	}
+
+	
