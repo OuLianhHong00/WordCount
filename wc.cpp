@@ -28,6 +28,11 @@ int main(int argc, char* argv[])
 		//printf("请输入可执行文件名\n");
 		//printf("请输入想要进行的操作（-w表示计算单词数 -c表示计算字符数 -l表示计算行数 -a表示计算空行 代码行 注释行 -s表示符合条件的文件数）\n");
 		//printf("请输入想要操作的文件名\n");
+		printf("进入可视化界面请输入wc.exe -x");
+		scanf("%s %s",argv[0],argv[1]);
+		if(!strcmp(argv[1],"-x")){
+		     system("D:\\softwaredaima\\c\\WordCount\\wc\\Debug\\wc.exe");
+		}else{
 		scanf("%s %s %s",argv[0],argv[1],argv[2]);//argv[0] 可执行程序的文件名argv[1] 指令，argv[2]文件名
 		if((fp=fopen(argv[2],"r"))==NULL){
 		   printf("文件不存在\n\n");
@@ -71,10 +76,12 @@ int main(int argc, char* argv[])
 		    printFile(argv[2],ccl,'f');
 		    printFile(argv[2],cn,'g');
 		 }
+		 
 
 		}
-		 
-     fclose(fp);   	
+		
+     fclose(fp);
+		}
 	}
 	return 0;
 }
